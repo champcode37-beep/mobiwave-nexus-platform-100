@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -36,6 +35,9 @@ export const useServiceTemplates = () => {
 
   const createTemplate = async (templateData: any): Promise<boolean> => {
     try {
+      if (!templateData) {
+        throw new Error('No template data provided');
+      }
       const newTemplate: ServiceTemplate = {
         id: Date.now().toString(),
         ...templateData,
@@ -47,7 +49,8 @@ export const useServiceTemplates = () => {
       setIsCreating(false);
       toast.success('Template created successfully');
       return true;
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Error creating template:', error.message);
       toast.error('Failed to create template');
       return false;
     }
@@ -55,15 +58,22 @@ export const useServiceTemplates = () => {
 
   const deleteTemplate = async (template: ServiceTemplate): Promise<void> => {
     try {
+      if (!template) {
+        throw new Error('No template provided');
+      }
       setTemplates(prev => prev.filter(t => t.id !== template.id));
       toast.success('Template deleted successfully');
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Error deleting template:', error.message);
       toast.error('Failed to delete template');
     }
   };
 
   const duplicateTemplate = async (template: ServiceTemplate): Promise<void> => {
     try {
+      if (!template) {
+        throw new Error('No template provided');
+      }
       const duplicated: ServiceTemplate = {
         ...template,
         id: Date.now().toString(),
@@ -74,7 +84,8 @@ export const useServiceTemplates = () => {
       };
       setTemplates(prev => [...prev, duplicated]);
       toast.success('Template duplicated successfully');
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Error duplicating template:', error.message);
       toast.error('Failed to duplicate template');
     }
   };
