@@ -89,9 +89,9 @@ serve(async (req) => {
         );
     }
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Admin session management error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorMessage = error.message || 'Unknown error';
     return new Response(
       JSON.stringify({ error: 'Internal server error', details: errorMessage }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -136,8 +136,8 @@ async function listAdminSessions(userId: string, supabase: any) {
       JSON.stringify({ data: safeSessions }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+  } catch (error: any) {
+    const errorMessage = error.message || 'Unknown error';
     throw new Error(`Failed to list admin sessions: ${errorMessage}`);
   }
 }
@@ -213,8 +213,8 @@ async function createAdminSession(userId: string, sessionData: any, req: Request
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+  } catch (error: any) {
+    const errorMessage = error.message || 'Unknown error';
     throw new Error(`Failed to create admin session: ${errorMessage}`);
   }
 }
@@ -258,8 +258,8 @@ async function terminateAdminSession(userId: string, sessionId: string, supabase
       JSON.stringify({ message: 'Admin session terminated successfully' }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+  } catch (error: any) {
+    const errorMessage = error.message || 'Unknown error';
     throw new Error(`Failed to terminate admin session: ${errorMessage}`);
   }
 }
@@ -304,8 +304,8 @@ async function terminateAllAdminSessions(userId: string, supabase: any, supabase
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+  } catch (error: any) {
+    const errorMessage = error.message || 'Unknown error';
     throw new Error(`Failed to terminate all admin sessions: ${errorMessage}`);
   }
 }
@@ -328,8 +328,8 @@ async function updateSessionActivity(userId: string, sessionId: string, supabase
       JSON.stringify({ message: 'Session activity updated successfully' }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+  } catch (error: any) {
+    const errorMessage = error.message || 'Unknown error';
     throw new Error(`Failed to update session activity: ${errorMessage}`);
   }
 }
@@ -379,8 +379,8 @@ async function getAdminSecurityLog(userId: string, supabase: any) {
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+  } catch (error: any) {
+    const errorMessage = error.message || 'Unknown error';
     throw new Error(`Failed to get admin security log: ${errorMessage}`);
   }
 }
