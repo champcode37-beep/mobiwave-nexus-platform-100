@@ -8,7 +8,6 @@ export const useServiceActivationMutations = () => {
   const approveServiceRequest = useMutation({
     mutationFn: async (requestId: string) => {
       try {
-        // Since service_activation_requests table doesn't exist, we'll work with user_service_subscriptions
         const { data, error } = await supabase
           .from('user_service_subscriptions')
           .update({ status: 'active', activated_at: new Date().toISOString() })
@@ -17,7 +16,7 @@ export const useServiceActivationMutations = () => {
           .single();
 
         if (error) {
-          throw new Error(`Error approving service request: ${error.message}`);
+          throw error;
         }
         return data;
       } catch (error: any) {
@@ -45,7 +44,7 @@ export const useServiceActivationMutations = () => {
           .single();
 
         if (error) {
-          throw new Error(`Error rejecting service request: ${error.message}`);
+          throw error;
         }
         return data;
       } catch (error: any) {
@@ -73,7 +72,7 @@ export const useServiceActivationMutations = () => {
           .single();
 
         if (error) {
-          throw new Error(`Error deactivating service: ${error.message}`);
+          throw error;
         }
         return data;
       } catch (error: any) {
@@ -94,6 +93,7 @@ export const useServiceActivationMutations = () => {
     rejectServiceRequest,
     deactivateUserService,
     isApproving: approveServiceRequest.isLoading,
-    isRejecting: rejectServiceRequest.isLoading
+    isRejecting: rejectServiceRequest.isLoading,
+    isDeactivating: deactivateUserService.isLoading
   };
 };
