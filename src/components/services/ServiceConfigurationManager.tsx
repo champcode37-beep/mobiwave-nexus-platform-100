@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,8 +11,9 @@ import { MpesaServiceConfig } from './configurations/MpesaServiceConfig';
 import { SMSServiceConfig } from './configurations/SMSServiceConfig';
 
 export function ServiceConfigurationManager() {
-  const { data: activatedServices = [], isLoading } = useMyActivatedServices();
+  const { data: activatedServices = [], isLoading, error } = useMyActivatedServices();
   const [selectedService, setSelectedService] = useState<string | null>(null);
+  const [serviceError, setServiceError] = useState<string | null>(null);
 
   const getServiceIcon = (serviceType: string) => {
     switch (serviceType) {
@@ -47,6 +47,14 @@ export function ServiceConfigurationManager() {
     }
   };
 
+  useEffect(() => {
+    if (error) {
+      setServiceError(error.message);
+    } else {
+      setServiceError(null);
+    }
+  }, [error]);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -67,6 +75,18 @@ export function ServiceConfigurationManager() {
           <Button>Request Service Access</Button>
         </CardContent>
       </Card>
+    );
+  }
+
+  if (serviceError) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="text-center">
+          <Settings className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+          <h3 className="text-lg font-semibold mb-2">Error Loading Services</h3>
+          <p className="text-gray-600">{serviceError}</p>
+        </div>
+      </div>
     );
   }
 
