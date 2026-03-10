@@ -7,11 +7,11 @@ import { useUserServiceActivations } from '@/hooks/useUserServiceActivations';
 import { useServiceActivationMutations } from '@/hooks/useServiceActivationMutations';
 
 export function UserServiceActivations() {
-  const { data: userActivations = [], isLoading } = useUserServiceActivations();
+  const { data: userActivations = [], isLoading, error } = useUserServiceActivations();
   const { deactivateUserService } = useServiceActivationMutations();
 
   const handleDeactivate = async (userId: string, serviceId: string) => {
-    if (confirm('Are you sure you want to deactivate this service for the user?')) {
+    if (window.confirm('Are you sure you want to deactivate this service for the user?')) {
       try {
         await deactivateUserService.mutateAsync({ userId, serviceId });
       } catch (error) {
@@ -39,6 +39,24 @@ export function UserServiceActivations() {
       <Card>
         <CardContent className="flex items-center justify-center p-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Shield className="w-5 h-5" />
+            Active User Services
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8 text-red-500">
+            <p>Error loading user services: {error.message}</p>
+          </div>
         </CardContent>
       </Card>
     );
