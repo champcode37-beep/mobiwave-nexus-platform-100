@@ -81,7 +81,6 @@ serve(async (req) => {
       );
     }
 
-    // Verify admin role
     const { data: profile } = await supabaseClient
       .from('profiles')
       .select('role')
@@ -103,16 +102,16 @@ serve(async (req) => {
         return await getAdminProfile(user.id, supabaseClient);
       
       case 'update':
-        return await updateAdminProfile(user.id, requestBody.profileData!, supabaseClient, supabaseAdmin);
+        return await updateAdminProfile(user.id, requestBody.profileData, supabaseClient, supabaseAdmin);
       
       case 'updateAvatar':
-        return await updateAdminAvatar(user.id, requestBody.avatarData!, supabaseClient, supabaseAdmin);
+        return await updateAdminAvatar(user.id, requestBody.avatarData, supabaseClient, supabaseAdmin);
       
       case 'updateSecurity':
-        return await updateAdminSecurity(user.id, requestBody.securityData!, supabaseClient, supabaseAdmin);
+        return await updateAdminSecurity(user.id, requestBody.securityData, supabaseClient, supabaseAdmin);
       
       case 'updatePreferences':
-        return await updateAdminPreferences(user.id, requestBody.preferences!, supabaseClient, supabaseAdmin);
+        return await updateAdminPreferences(user.id, requestBody.preferences, supabaseClient, supabaseAdmin);
       
       case 'getAuditLog':
         return await getAdminProfileAuditLog(user.id, supabaseClient);
@@ -136,7 +135,6 @@ serve(async (req) => {
 
 async function getAdminProfile(userId: string, supabase: any) {
   try {
-    // Get main profile data
     const { data: profileData, error: profileError } = await supabase
       .from('profiles')
       .select('*')
@@ -145,28 +143,24 @@ async function getAdminProfile(userId: string, supabase: any) {
 
     if (profileError) throw profileError;
 
-    // Get admin profile data
     const { data: adminProfile, error: adminProfileError } = await supabase
       .from('admin_profiles')
       .select('*')
       .eq('user_id', userId)
       .single();
 
-    // Get admin security settings
     const { data: securitySettings, error: securityError } = await supabase
       .from('admin_security_settings')
       .select('*')
       .eq('user_id', userId)
       .single();
 
-    // Get admin preferences
     const { data: preferences, error: preferencesError } = await supabase
       .from('admin_preferences')
       .select('*')
       .eq('user_id', userId)
       .single();
 
-    // Combine all data
     const combinedData = {
       ...profileData,
       ...adminProfile,
@@ -186,7 +180,6 @@ async function getAdminProfile(userId: string, supabase: any) {
 
 async function updateAdminProfile(userId: string, profileData: any, supabase: any, supabaseAdmin: any) {
   try {
-    // Update main profile
     const { data: updatedProfile, error: profileError } = await supabase
       .from('profiles')
       .update({
@@ -201,7 +194,6 @@ async function updateAdminProfile(userId: string, profileData: any, supabase: an
 
     if (profileError) throw profileError;
 
-    // Update or insert admin-specific profile data
     const { error: adminProfileError } = await supabase
       .from('admin_profiles')
       .upsert({
@@ -216,7 +208,6 @@ async function updateAdminProfile(userId: string, profileData: any, supabase: an
 
     if (adminProfileError) throw adminProfileError;
 
-    // Log the profile update
     await supabaseAdmin.from('audit_logs').insert({
       user_id: userId,
       action: 'ADMIN_PROFILE_UPDATE',
@@ -251,7 +242,6 @@ async function updateAdminAvatar(userId: string, avatarData: any, supabase: any,
 
     if (avatarError) throw avatarError;
 
-    // Log the avatar update
     await supabaseAdmin.from('audit_logs').insert({
       user_id: userId,
       action: 'ADMIN_AVATAR_UPDATE',
@@ -288,7 +278,6 @@ async function updateAdminSecurity(userId: string, securityData: any, supabase: 
 
     if (securityError) throw securityError;
 
-    // Log the security update
     await supabaseAdmin.from('audit_logs').insert({
       user_id: userId,
       action: 'ADMIN_SECURITY_UPDATE',
@@ -322,7 +311,6 @@ async function updateAdminPreferences(userId: string, preferences: any, supabase
 
     if (preferencesError) throw preferencesError;
 
-    // Log the preferences update
     await supabaseAdmin.from('audit_logs').insert({
       user_id: userId,
       action: 'ADMIN_PREFERENCES_UPDATE',
