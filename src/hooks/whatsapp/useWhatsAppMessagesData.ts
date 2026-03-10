@@ -1,4 +1,3 @@
-
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -18,14 +17,22 @@ interface WhatsAppMessage {
 }
 
 const fetchWhatsAppMessages = async (subscriptionId?: string): Promise<WhatsAppMessage[]> => {
-  // Return empty array since whatsapp_messages table doesn't exist in current schema
-  return [];
+  try {
+    // Return empty array since whatsapp_messages table doesn't exist in current schema
+    return [];
+  } catch (error) {
+    console.error('Error fetching WhatsApp messages:', error);
+    throw error;
+  }
 };
 
 export const useWhatsAppMessagesData = (subscriptionId?: string) => {
   return useQuery({
     queryKey: ['whatsapp-messages', subscriptionId],
     queryFn: () => fetchWhatsAppMessages(subscriptionId),
-    enabled: !!subscriptionId
+    enabled: !!subscriptionId,
+    onError: (error) => {
+      console.error('Error fetching WhatsApp messages:', error);
+    }
   });
 };
