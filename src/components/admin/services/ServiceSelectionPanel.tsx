@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -29,7 +28,7 @@ export function ServiceSelectionPanel({
   selectedService,
   onServiceSelect
 }: ServiceSelectionPanelProps) {
-  const getServiceIcon = (serviceType: string) => {
+  const getServiceIcon = (serviceType: string): string => {
     switch (serviceType) {
       case 'ussd': return '📱';
       case 'shortcode': return '💬';
@@ -42,6 +41,8 @@ export function ServiceSelectionPanel({
       default: return '⚙️';
     }
   };
+
+  if (!services || !services.length) return <div>No services available</div>;
 
   return (
     <Card>
