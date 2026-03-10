@@ -18,6 +18,7 @@ if (ENCRYPTION_KEY_B64) {
     );
   } catch (error) {
     console.error("Failed to decode encryption key:", error);
+    throw new Error("Encryption key decoding failed");
   }
 }
 
@@ -43,13 +44,16 @@ async function decryptApiKey(encrypted: string): Promise<string> {
     ["decrypt"],
   );
   
-  const plainBuffer = await crypto.subtle.decrypt(
-    { name: "AES-GCM", iv },
-    key,
-    cipherBytes,
-  );
-  
-  return new TextDecoder().decode(plainBuffer);
+  try {
+    const plainBuffer = await crypto.subtle.decrypt(
+      { name: "AES-GCM", iv },
+      key,
+      cipherBytes,
+    );
+    return new TextDecoder().decode(plainBuffer);
+  } catch (error) {
+    throw new Error("Failed to decrypt API key");
+  }
 }
 
 serve(async (req) => {
@@ -64,40 +68,43 @@ serve(async (req) => {
     }
 
     // Create Supabase client
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-    );
+    const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
+    const supabaseServiceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+    if (!supabaseUrl || !supabaseServiceRoleKey) {
+      throw new Error("Supabase URL and service role key are required");
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
 
     // Get user from auth header
-    const { data: { user }, error: authError } = await supabase.auth.getUser(
+    const user AuthResult = await supabase.auth.getUser(
       authHeader.replace("Bearer ", "")
     );
 
-    if (authError || !user) {
+    if (!userAuthResult.data || !userAuthResult.data.user) {
       throw new Error("Invalid authentication");
     }
 
     // Get user's encrypted credentials
-    const { data: credentials, error: credError } = await supabase
+    const credentialsResult = await supabase
       .from("api_credentials")
       .select("*")
-      .eq("user_id", user.id)
+      .eq("user_id", userAuthResult.data.user.id)
       .eq("service_name", "mspace")
       .eq("is_active", true)
       .single();
 
-    if (credError || !credentials) {
+    if (!credentialsResult.data) {
       throw new Error("No mspace credentials found");
     }
 
     // Check if credentials are encrypted
-    if (!credentials.api_key_encrypted) {
+    if (!credentialsResult.data.api_key_encrypted) {
       // Return plain text credentials as-is
       return new Response(JSON.stringify({
-        apiKey: credentials.api_key,
-        username: credentials.username,
-        senderId: credentials.sender_id,
+        apiKey: credentialsResult.data.api_key,
+        username: credentialsResult.data.username,
+        senderId: credentialsResult.data.sender_id,
         source: 'plaintext'
       }), {
         status: 200,
@@ -106,13 +113,13 @@ serve(async (req) => {
     }
 
     // Decrypt the API key
-    const decryptedApiKey = await decryptApiKey(credentials.api_key_encrypted as string);
+    const decryptedApiKey = await decryptApiKey(credentialsResult.data.api_key_encrypted as string);
     
     // Return decrypted credentials
     return new Response(JSON.stringify({
       apiKey: decryptedApiKey,
-      username: credentials.username,
-      senderId: credentials.sender_id,
+      username: credentialsResult.data.username,
+      senderId: credentialsResult.data.sender_id,
       source: 'decrypted'
     }), {
       status: 200,
