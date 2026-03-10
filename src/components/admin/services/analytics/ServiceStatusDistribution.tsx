@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
@@ -19,6 +18,17 @@ export function ServiceStatusDistribution({ data }: ServiceStatusDistributionPro
     suspended: '#ef4444',
     inactive: '#6b7280'
   };
+
+  if (!data || data.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Service Status Distribution</CardTitle>
+        </CardHeader>
+        <CardContent>No data available</CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
