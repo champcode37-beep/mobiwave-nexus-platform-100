@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -37,9 +36,11 @@ interface ServiceEditDialogProps {
 
 export function ServiceEditDialog({ service, isOpen, onClose, onSave, isLoading }: ServiceEditDialogProps) {
   const [formData, setFormData] = useState<ServiceCatalog | null>(service);
+  const [error, setError] = useState<string | null>(null);
 
   React.useEffect(() => {
     setFormData(service);
+    setError(null);
   }, [service]);
 
   if (!formData) return null;
@@ -51,7 +52,11 @@ export function ServiceEditDialog({ service, isOpen, onClose, onSave, isLoading 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (formData) {
-      onSave(formData);
+      try {
+        onSave(formData);
+      } catch (error) {
+        setError(error.message);
+      }
     }
   };
 
@@ -61,6 +66,8 @@ export function ServiceEditDialog({ service, isOpen, onClose, onSave, isLoading 
         <DialogHeader>
           <DialogTitle>Edit Service: {formData.service_name}</DialogTitle>
         </DialogHeader>
+        
+        {error && <div className="text-red-500">{error}</div>}
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
