@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,7 +10,7 @@ interface WhatsAppMessageListProps {
 }
 
 export function WhatsAppMessageList({ subscriptionId }: WhatsAppMessageListProps) {
-  const { messages, isLoading } = useWhatsAppMessages(subscriptionId);
+  const { messages, isLoading, error } = useWhatsAppMessages(subscriptionId);
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -40,6 +39,15 @@ export function WhatsAppMessageList({ subscriptionId }: WhatsAppMessageListProps
     return (
       <div className="flex items-center justify-center p-8">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center p-8 text-red-600">
+        <XCircle className="w-4 h-4 mr-2" />
+        Error loading messages: {error.message}
       </div>
     );
   }
