@@ -1,4 +1,3 @@
-
 import React, { Component, ReactNode } from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -28,7 +27,13 @@ export class ErrorBoundaryWrapper extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: any) {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
-    this.props.onError?.(error, errorInfo);
+    if (this.props.onError) {
+      try {
+        this.props.onError(error, errorInfo);
+      } catch (onErrorError) {
+        console.error('Error handling error:', onErrorError);
+      }
+    }
   }
 
   handleRetry = () => {
