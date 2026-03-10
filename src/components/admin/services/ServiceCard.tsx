@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -28,27 +27,44 @@ interface ServiceCardProps {
 }
 
 export function ServiceCard({ service, onEdit, onToggleStatus, isUpdating }: ServiceCardProps) {
-  const getServiceIcon = (serviceType: string) => {
-    switch (serviceType) {
-      case 'ussd': return '📱';
-      case 'shortcode': return '💬';
-      case 'mpesa': return '💳';
-      case 'survey': return '📊';
-      case 'servicedesk': return '🎫';
-      case 'rewards': return '🎁';
-      case 'whatsapp': return '💚';
-      case 'email': return '📧';
-      case 'sms': return '📱';
-      default: return '⚙️';
+  const getServiceIcon = (serviceType: string): string => {
+    try {
+      switch (serviceType) {
+        case 'ussd': return '📱';
+        case 'shortcode': return '💬';
+        case 'mpesa': return '💳';
+        case 'survey': return '📊';
+        case 'servicedesk': return '🎫';
+        case 'rewards': return '🎁';
+        case 'whatsapp': return '💚';
+        case 'email': return '📧';
+        case 'sms': return '📱';
+        default: return '⚙️';
+      }
+    } catch (error) {
+      console.error('Failed to get service icon:', error);
+      return '⚙️';
     }
   };
 
   const handleEdit = () => {
-    onEdit?.(service);
+    if (onEdit) {
+      try {
+        onEdit(service);
+      } catch (error) {
+        console.error('Failed to handle edit:', error);
+      }
+    }
   };
 
   const handleToggleStatus = () => {
-    onToggleStatus?.(service.id, !service.is_active);
+    if (onToggleStatus) {
+      try {
+        onToggleStatus(service.id, !service.is_active);
+      } catch (error) {
+        console.error('Failed to handle toggle status:', error);
+      }
+    }
   };
 
   return (
