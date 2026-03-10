@@ -1,4 +1,3 @@
-
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -8,16 +7,22 @@ export const useServiceActivationMutations = () => {
 
   const approveServiceRequest = useMutation({
     mutationFn: async (requestId: string) => {
-      // Since service_activation_requests table doesn't exist, we'll work with user_service_subscriptions
-      const { data, error } = await supabase
-        .from('user_service_subscriptions')
-        .update({ status: 'active', activated_at: new Date().toISOString() })
-        .eq('id', requestId)
-        .select()
-        .single();
+      try {
+        // Since service_activation_requests table doesn't exist, we'll work with user_service_subscriptions
+        const { data, error } = await supabase
+          .from('user_service_subscriptions')
+          .update({ status: 'active', activated_at: new Date().toISOString() })
+          .eq('id', requestId)
+          .select()
+          .single();
 
-      if (error) throw error;
-      return data;
+        if (error) {
+          throw new Error(`Error approving service request: ${error.message}`);
+        }
+        return data;
+      } catch (error: any) {
+        throw new Error(`Error approving service request: ${error.message}`);
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['service-activation-requests'] });
@@ -31,15 +36,21 @@ export const useServiceActivationMutations = () => {
 
   const rejectServiceRequest = useMutation({
     mutationFn: async ({ requestId, reason }: { requestId: string; reason?: string }) => {
-      const { data, error } = await supabase
-        .from('user_service_subscriptions')
-        .update({ status: 'rejected' })
-        .eq('id', requestId)
-        .select()
-        .single();
+      try {
+        const { data, error } = await supabase
+          .from('user_service_subscriptions')
+          .update({ status: 'rejected' })
+          .eq('id', requestId)
+          .select()
+          .single();
 
-      if (error) throw error;
-      return data;
+        if (error) {
+          throw new Error(`Error rejecting service request: ${error.message}`);
+        }
+        return data;
+      } catch (error: any) {
+        throw new Error(`Error rejecting service request: ${error.message}`);
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['service-activation-requests'] });
@@ -52,16 +63,22 @@ export const useServiceActivationMutations = () => {
 
   const deactivateUserService = useMutation({
     mutationFn: async ({ userId, serviceId }: { userId: string; serviceId: string }) => {
-      const { data, error } = await supabase
-        .from('user_service_subscriptions')
-        .update({ status: 'inactive' })
-        .eq('user_id', userId)
-        .eq('service_id', serviceId)
-        .select()
-        .single();
+      try {
+        const { data, error } = await supabase
+          .from('user_service_subscriptions')
+          .update({ status: 'inactive' })
+          .eq('user_id', userId)
+          .eq('service_id', serviceId)
+          .select()
+          .single();
 
-      if (error) throw error;
-      return data;
+        if (error) {
+          throw new Error(`Error deactivating service: ${error.message}`);
+        }
+        return data;
+      } catch (error: any) {
+        throw new Error(`Error deactivating service: ${error.message}`);
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-service-activations'] });
@@ -76,7 +93,7 @@ export const useServiceActivationMutations = () => {
     approveServiceRequest,
     rejectServiceRequest,
     deactivateUserService,
-    isApproving: approveServiceRequest.isPending,
-    isRejecting: rejectServiceRequest.isPending
+    isApproving: approveServiceRequest.isLoading,
+    isRejecting: rejectServiceRequest.isLoading
   };
 };
