@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,15 +21,27 @@ interface USSDApplicationCardProps {
 export function USSDApplicationCard({ application, onEdit, onTest }: USSDApplicationCardProps) {
   const handleEdit = () => {
     if (onEdit) {
-      onEdit(application);
+      try {
+        onEdit(application);
+      } catch (error) {
+        console.error('Error editing USSD application:', error);
+      }
     }
   };
 
   const handleTest = () => {
     if (onTest) {
-      onTest(application);
+      try {
+        onTest(application);
+      } catch (error) {
+        console.error('Error testing USSD application:', error);
+      }
     }
   };
+
+  if (!application) {
+    return null;
+  }
 
   return (
     <Card className="hover:shadow-lg transition-shadow">
@@ -53,12 +64,12 @@ export function USSDApplicationCard({ application, onEdit, onTest }: USSDApplica
           <div>
             <p className="text-sm text-gray-600">Callback URL:</p>
             <p className="text-sm font-mono bg-gray-50 p-2 rounded truncate">
-              {application.callback_url}
+              {application.callback_url || 'Not configured'}
             </p>
           </div>
           <div>
             <p className="text-sm text-gray-600">Menu Nodes:</p>
-            <p className="text-sm">{application.menu_structure.length} menus configured</p>
+            <p className="text-sm">{application.menu_structure ? application.menu_structure.length : 0} menus configured</p>
           </div>
           <div className="flex gap-2">
             <Button size="sm" variant="outline" className="flex-1" onClick={handleEdit}>
