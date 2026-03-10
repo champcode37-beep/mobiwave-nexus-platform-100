@@ -6,7 +6,7 @@ import './index.css';
 try {
   const container = document.getElementById("root");
   if (!container) {
-    throw new Error("Root element not found");
+    throw new Error("Root element not found in DOM");
   }
 
   const root = createRoot(container);
@@ -15,7 +15,7 @@ try {
       <App />
     </StrictMode>
   );
-} catch (error) {
-  console.error('Error rendering application:', error);
+} catch (error: any) {
+  console.error('Error rendering application:', error.message, error.stack);
   throw error;
 }
