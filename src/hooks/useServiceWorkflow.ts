@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import { toast } from 'sonner';
 
@@ -100,6 +99,10 @@ export function useServiceWorkflow() {
   }, []);
 
   const executeStep = useCallback(async (stepIndex: number) => {
+    if (stepIndex < 0 || stepIndex >= workflowSteps.length) {
+      console.error('Invalid step index');
+      return;
+    }
     const step = workflowSteps[stepIndex];
     
     // Update step to in_progress
