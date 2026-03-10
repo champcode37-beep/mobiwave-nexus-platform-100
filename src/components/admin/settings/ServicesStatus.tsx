@@ -67,10 +67,10 @@ export function ServicesStatus({ serviceStatus }: ServicesStatusProps) {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {serviceStatus?.map((service) => {
+          {serviceStatus?.map((service, index) => {
             const StatusIcon = getStatusIcon(service.status);
             return (
-              <div key={service.id} className="flex items-center justify-between p-4 border rounded-lg">
+              <div key={service.id || index} className="flex items-center justify-between p-4 border rounded-lg">
                 <div className="flex items-center gap-3">
                   <StatusIcon className={`w-5 h-5 ${getStatusColor(service.status)}`} />
                   <div>
