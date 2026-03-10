@@ -151,20 +151,22 @@ serve(async (req) => {
         throw new Error(`Failed to analyze segment: ${analysisError.message}`)
       }
 
+      const breakdown = {
+        by_role: potentialUsers?.reduce((acc: Record<string, number>, user: { role: string }) => {
+          acc[user.role] = (acc[user.role] || 0) + 1
+          return acc
+        }, {}),
+        by_user_type: potentialUsers?.reduce((acc: Record<string, number>, user: { user_type: string }) => {
+          acc[user.user_type] = (acc[user.user_type] || 0) + 1
+          return acc
+        }, {})
+      }
+
       return new Response(
         JSON.stringify({
           message: 'Segment analysis completed',
           potential_users: potentialUsers?.length || 0,
-          breakdown: {
-            by_role: potentialUsers?.reduce((acc: Record<string, number>, user: { role: string }) => {
-              acc[user.role] = (acc[user.role] || 0) + 1
-              return acc
-            }, {}),
-            by_user_type: potentialUsers?.reduce((acc: Record<string, number>, user: { user_type: string }) => {
-              acc[user.user_type] = (acc[user.user_type] || 0) + 1
-              return acc
-            }, {})
-          }
+          breakdown: breakdown
         }),
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
