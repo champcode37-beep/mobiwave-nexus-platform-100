@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -63,7 +62,7 @@ export function ServiceTemplateManager({ services }: ServiceTemplateManagerProps
     }
   ];
 
-  const getServiceIcon = (serviceType: string) => {
+  const getServiceIcon = (serviceType: string): string => {
     switch (serviceType) {
       case 'ussd': return '📱';
       case 'shortcode': return '💬';
@@ -74,6 +73,14 @@ export function ServiceTemplateManager({ services }: ServiceTemplateManagerProps
       case 'whatsapp': return '💚';
       case 'sms': return '📧';
       default: return '⚙️';
+    }
+  };
+
+  const getTransactionFeeText = (template: any) => {
+    if (template.configuration.transaction_fee_type === 'none') {
+      return 'None';
+    } else {
+      return `${template.configuration.transaction_fee_amount}${template.configuration.transaction_fee_type === 'percentage' ? '%' : ' KES'}`;
     }
   };
 
@@ -121,10 +128,7 @@ export function ServiceTemplateManager({ services }: ServiceTemplateManagerProps
                 <div className="flex justify-between">
                   <span className="text-gray-500">Transaction Fee:</span>
                   <span>
-                    {template.configuration.transaction_fee_type === 'none' 
-                      ? 'None' 
-                      : `${template.configuration.transaction_fee_amount}${template.configuration.transaction_fee_type === 'percentage' ? '%' : ' KES'}`
-                    }
+                    {getTransactionFeeText(template)}
                   </span>
                 </div>
               </div>
