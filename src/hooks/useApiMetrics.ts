@@ -54,7 +54,7 @@ export const useApiMetrics = () => {
           return logTime > hourAgo;
         }).length || 0;
         
-        const rateLimitUsage = (currentHourRequests / maxRequestsPerHour) * 100;
+        const rateLimitUsage = Math.min(100, (currentHourRequests / maxRequestsPerHour) * 100);
 
         // Generate top endpoints data
         const endpointCounts = new Map<string, number>();
@@ -83,8 +83,8 @@ export const useApiMetrics = () => {
           rateLimitUsage: Math.round(rateLimitUsage),
           topEndpoints
         };
-      } catch (error) {
-        console.error('Error fetching API metrics:', error);
+      } catch (error: any) {
+        console.error('Error fetching API metrics:', error.message);
         
         // Fallback data
         return {
@@ -102,6 +102,7 @@ export const useApiMetrics = () => {
         };
       }
     },
+    retry: 3,
     refetchInterval: 30000, // Update every 30 seconds
     staleTime: 15000,
   });
