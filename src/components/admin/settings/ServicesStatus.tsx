@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Server, CheckCircle, AlertTriangle } from 'lucide-react';
@@ -16,7 +15,7 @@ interface ServicesStatusProps {
 }
 
 export function ServicesStatus({ serviceStatus }: ServicesStatusProps) {
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: string): string => {
     switch (status) {
       case 'healthy': return 'text-green-600';
       case 'warning': return 'text-yellow-600';
@@ -25,7 +24,7 @@ export function ServicesStatus({ serviceStatus }: ServicesStatusProps) {
     }
   };
 
-  const getStatusIcon = (status: string) => {
+  const getStatusIcon = (status: string): React.ComponentType<React.ComponentProps<'svg'>> => {
     switch (status) {
       case 'healthy': return CheckCircle;
       case 'warning': return AlertTriangle;
@@ -33,6 +32,27 @@ export function ServicesStatus({ serviceStatus }: ServicesStatusProps) {
       default: return Server;
     }
   };
+
+  if (!serviceStatus) {
+    return (
+      <Card className="border-0 shadow-lg bg-white/70 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Server className="w-5 h-5 text-green-600" />
+            Service Status
+          </CardTitle>
+          <CardDescription>
+            Monitor the health and status of all system services
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center p-4">
+            No service status available
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="border-0 shadow-lg bg-white/70 backdrop-blur-sm">
