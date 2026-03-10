@@ -38,9 +38,13 @@ export const useApiMetrics = () => {
           .gte('created_at', todayStart.toISOString())
           .limit(1000);
 
+        if (!apiLogs || !todayLogs) {
+          throw new Error('Failed to fetch API logs');
+        }
+
         // Calculate metrics
-        const totalRequests = apiLogs?.length || 0;
-        const requestsToday = todayLogs?.length || 0;
+        const totalRequests = apiLogs.length;
+        const requestsToday = todayLogs.length;
         
         // Simulate response times and error rates based on activity
         const averageResponseTime = Math.max(50, 120 + (totalRequests * 0.1) + (Math.random() * 50));
@@ -48,17 +52,17 @@ export const useApiMetrics = () => {
         
         // Calculate rate limit usage based on current activity
         const maxRequestsPerHour = 1000; // Example limit
-        const currentHourRequests = apiLogs?.filter(log => {
+        const currentHourRequests = apiLogs.filter(log => {
           const logTime = new Date(log.created_at);
           const hourAgo = new Date(Date.now() - 60 * 60 * 1000);
           return logTime > hourAgo;
-        }).length || 0;
+        }).length;
         
         const rateLimitUsage = Math.min(100, (currentHourRequests / maxRequestsPerHour) * 100);
 
         // Generate top endpoints data
         const endpointCounts = new Map<string, number>();
-        apiLogs?.forEach(log => {
+        apiLogs.forEach(log => {
           // Use endpoint from metadata if available
           const endpoint = (log.metadata && typeof log.metadata === 'object' && 'endpoint' in log.metadata)
             ? (log.metadata as any).endpoint
@@ -105,6 +109,7 @@ export const useApiMetrics = () => {
     retry: 3,
     refetchInterval: 30000, // Update every 30 seconds
     staleTime: 15000,
+    onError: (error) => console.error('Error fetching API metrics:', error)
   });
 
   return {
