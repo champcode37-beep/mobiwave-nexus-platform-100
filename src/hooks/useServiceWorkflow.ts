@@ -101,6 +101,7 @@ export function useServiceWorkflow() {
   const executeStep = useCallback(async (stepIndex: number) => {
     if (stepIndex < 0 || stepIndex >= workflowSteps.length) {
       console.error('Invalid step index');
+      toast.error('Invalid step index');
       return;
     }
     const step = workflowSteps[stepIndex];
@@ -128,11 +129,12 @@ export function useServiceWorkflow() {
         toast.success('Service setup workflow completed successfully');
       }
     } catch (error) {
+      console.error(error);
       // Mark step as failed
       setWorkflowSteps(prev => prev.map((s, i) => 
         i === stepIndex ? { ...s, status: 'failed' } : s
       ));
-      toast.error(`${step.title} failed`);
+      toast.error(`${step.title} failed: ${error.message}`);
     }
   }, [workflowSteps]);
 
