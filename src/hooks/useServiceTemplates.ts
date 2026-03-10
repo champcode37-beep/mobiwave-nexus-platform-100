@@ -35,8 +35,8 @@ export const useServiceTemplates = () => {
 
   const createTemplate = async (templateData: any): Promise<boolean> => {
     try {
-      if (!templateData) {
-        throw new Error('No template data provided');
+      if (!templateData || Object.keys(templateData).length === 0) {
+        throw new Error('No template data provided or empty object');
       }
       const newTemplate: ServiceTemplate = {
         id: Date.now().toString(),
@@ -52,14 +52,15 @@ export const useServiceTemplates = () => {
     } catch (error: any) {
       console.error('Error creating template:', error.message);
       toast.error('Failed to create template');
+      setIsCreating(false);
       return false;
     }
   };
 
   const deleteTemplate = async (template: ServiceTemplate): Promise<void> => {
     try {
-      if (!template) {
-        throw new Error('No template provided');
+      if (!template || !template.id) {
+        throw new Error('No template provided or missing id');
       }
       setTemplates(prev => prev.filter(t => t.id !== template.id));
       toast.success('Template deleted successfully');
@@ -71,8 +72,8 @@ export const useServiceTemplates = () => {
 
   const duplicateTemplate = async (template: ServiceTemplate): Promise<void> => {
     try {
-      if (!template) {
-        throw new Error('No template provided');
+      if (!template || !template.id) {
+        throw new Error('No template provided or missing id');
       }
       const duplicated: ServiceTemplate = {
         ...template,
